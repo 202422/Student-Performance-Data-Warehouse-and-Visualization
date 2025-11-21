@@ -3,6 +3,7 @@
 ## Table of Content
 - [Summary](#summary)
 - [Dataset](#dataset)
+- [Data Warehouse](#data-warehouse)
 
 ## Summary 
 This is an end-to-end data engineering and analytics project focused on transforming raw academic evaluation data into reliable insights. The project integrates ETL pipelines built with **Talend** to extract, clean, and load **csv data** into a **PostgreSQL data warehouse** structured in **Star Model**. On top of this warehouse, a full web analytics platform is developed using **Django (backend API)** and **React.js (frontend)** to deliver dynamic dashboards and personalized views for administrators, professors, and students. The system provides indicators on student performance, course efficiency, evaluation criteria, and activity weighting, enabling data-driven academic decisions.
@@ -29,3 +30,7 @@ The dataset contains **34,135 evaluation entries** and **13 columns**, where eac
 * **Note** — Raw score obtained by the student for this criterion.
 * **Note Pondérée** — Weighted score based on activity and criterion weights.
 
+
+## Data Warehouse
+
+![](Assets/DataWarehouse.png)
