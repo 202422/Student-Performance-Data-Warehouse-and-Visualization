@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:TalendMetadata="http://www.talend.org/metadata/connection/2010" xmlns:orgomg.cwm.resource.relational="http:///orgomg/cwm/resource/relational.ecore">
+  <TalendMetadata:DatabaseConnection xmi:id="_b9OjwMinEfCcAZXytadjUg" name="Student_perf" id="_KflBIMinEfCcAZXytadjUg" label="Student_perf" dataPackage="_b_LEgMinEfCcAZXytadjUg" DatabaseType="PostgreSQL" DriverClass="org.postgresql.Driver" URL="jdbc:postgresql://localhost:5432/notes_academiques?" dbVersionString="V9_X" Port="5432" Username="postgres" Password="enc:system.encryption.key.v1:11oO5W1oRZTRUZP/45VOOpaOiob1B8MWklrXk1kWSYmGrQUX4z78Wv4hjQ==" ServerName="localhost" DatasourceName="" FileFieldName="" SID="notes_academiques" SqlSynthax="" StringQuote="" NullChar="" DbmsId="postgres_id" ProductId="POSTGRESQL" AdditionalParams="" StandardSQL="true" SQLMode="false" UiSchema="public">
+    <taggedValue xmi:id="_b9OjwcinEfCcAZXytadjUg" tag="Is Conn Need Reload" value="false"/>
+    <taggedValue xmi:id="_b9qooMinEfCcAZXytadjUg" tag="package filter" value=""/>
+    <taggedValue xmi:id="_b90ZoMinEfCcAZXytadjUg" tag="Status" value=""/>
+    <taggedValue xmi:id="_b90ZocinEfCcAZXytadjUg" tag="Version" value="0.1"/>
+    <taggedValue xmi:id="_b90ZosinEfCcAZXytadjUg" tag="Purpose" value=""/>
+    <taggedValue xmi:id="_b90Zo8inEfCcAZXytadjUg" tag="Description" value=""/>
+    <taggedValue xmi:id="_b90ZpMinEfCcAZXytadjUg" tag="Author" value=""/>
+    <taggedValue xmi:id="_b90ZpcinEfCcAZXytadjUg" tag="otherParameter"/>
+    <taggedValue xmi:id="_b-aPgMinEfCcAZXytadjUg" tag="DB ProductName" value="PostgreSQL"/>
+    <taggedValue xmi:id="_b-aPgcinEfCcAZXytadjUg" tag="DB ProductVersion" value="18.1"/>
+    <taggedValue xmi:id="_b-aPgsinEfCcAZXytadjUg" tag="DB IdentifierQuoteString" value="&quot;"/>
+    <parameters xmi:id="_b9OjwsinEfCcAZXytadjUg" key="CONN_PARA_KEY_USERNAME" value="postgres"/>
+  </TalendMetadata:DatabaseConnection>
+  <orgomg.cwm.resource.relational:Catalog xmi:id="_b_LEgMinEfCcAZXytadjUg" name="notes_academiques" dataManager="_b9OjwMinEfCcAZXytadjUg">
+    <ownedElement xsi:type="orgomg.cwm.resource.relational:Schema" xmi:id="_b_LEgcinEfCcAZXytadjUg" name="public"/>
+  </orgomg.cwm.resource.relational:Catalog>
+</xmi:XMI>
