@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<talendfile:ContextType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" xmi:id="_pbadQMrCEfCGq6bX7KIlRw" confirmationNeeded="false" name="Default">
+  <contextParameter xmi:id="_pbadQcrCEfCGq6bX7KIlRw" comment="" name="serverName" prompt="serverName?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="localhost"/>
+  <contextParameter xmi:id="_pbadQsrCEfCGq6bX7KIlRw" comment="" name="database" prompt="database?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="notes_academiques"/>
+  <contextParameter xmi:id="_pbadQ8rCEfCGq6bX7KIlRw" comment="" name="port" prompt="port?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="5432"/>
+  <contextParameter xmi:id="_pbadRMrCEfCGq6bX7KIlRw" comment="" name="shema" prompt="shema?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="public"/>
+  <contextParameter xmi:id="_pbadRcrCEfCGq6bX7KIlRw" comment="" name="utilisateur" prompt="utilisateur?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value="postgres"/>
+  <contextParameter xmi:id="_pbadRsrCEfCGq6bX7KIlRw" comment="" name="password" prompt="password?" promptNeeded="false" repositoryContextId="built-in" type="id_Password" value="enc:system.encryption.key.v1:skycVd5X8LO3/GAMS8H4sz5uBfO4P1YLiAo97t0aFI9UeZja3rhEDyxaWg=="/>
+  <contextParameter xmi:id="_pbadR8rCEfCGq6bX7KIlRw" comment="" name="additionalParams" prompt="additionalParams?" promptNeeded="false" repositoryContextId="built-in" type="id_String" value=""/>
+</talendfile:ContextType>

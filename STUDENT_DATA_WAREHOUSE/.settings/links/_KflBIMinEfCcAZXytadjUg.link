@@ -1,0 +1,29 @@
+{
+  "itemId" : "_KflBIMinEfCcAZXytadjUg",
+  "contextList" : [ {
+    "contextName" : "Default",
+    "repoId" : "_pbA0oMrCEfCGq6bX7KIlRw",
+    "parameterList" : [ {
+      "id" : "_pbadQcrCEfCGq6bX7KIlRw",
+      "name" : "serverName"
+    }, {
+      "id" : "_pbadQsrCEfCGq6bX7KIlRw",
+      "name" : "database"
+    }, {
+      "id" : "_pbadQ8rCEfCGq6bX7KIlRw",
+      "name" : "port"
+    }, {
+      "id" : "_pbadRMrCEfCGq6bX7KIlRw",
+      "name" : "shema"
+    }, {
+      "id" : "_pbadRcrCEfCGq6bX7KIlRw",
+      "name" : "utilisateur"
+    }, {
+      "id" : "_pbadRsrCEfCGq6bX7KIlRw",
+      "name" : "password"
+    }, {
+      "id" : "_pbadR8rCEfCGq6bX7KIlRw",
+      "name" : "additionalParams"
+    } ]
+  } ]
+}

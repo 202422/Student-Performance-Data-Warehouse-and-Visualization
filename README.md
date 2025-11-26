@@ -40,3 +40,5 @@ The dataset contains **34,135 evaluation entries** and **13 columns**, where eac
 ## Jobs
 
 ![](Assets/Job_load_insert.png)
+
+![](Assets/fact_table.png)
