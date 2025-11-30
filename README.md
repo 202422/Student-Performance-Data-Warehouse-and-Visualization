@@ -1,6 +1,7 @@
 # Student-Performance-Data-Warehouse-and-Visualization
 
 ## Table of Content
+- [Demo](#demo)
 - [Summary](#summary)
 - [Dataset](#dataset)
 - [Data Warehouse](#data-warehouse)
