@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from django.db.models import Avg, Sum
 from .models import FaitNotes, DimEtudiant, DimCours, DimFiliere
 from .utils import get_notes_grouped
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 class MoyenneParCours(APIView):
     def get(self, request):
@@ -57,8 +60,8 @@ class TauxReussite(APIView):
         if total_etudiants == 0:
             return Response({"taux_reussite": 0})
 
-        # Étape 3 : Compter ceux qui ont >= 14/20
-        reussites = sum(1 for m in moyennes if m >= 14)
+        # Étape 3 : Compter ceux qui ont >= 10/20
+        reussites = sum(1 for m in moyennes if m >= 10)
 
         taux = (reussites / total_etudiants) * 100
 
@@ -149,3 +152,68 @@ class MoyenneFinaleParFiliere(APIView):
             resultats = sorted(resultats, key=lambda x: x["Moyenne finale"], reverse=True)
 
         return Response(resultats)
+    
+
+class HistogrammeNotes(APIView):
+    """
+    Retourne les intervalles de notes avec le nombre d'étudiants dans chaque intervalle.
+    Exemple de retour :
+    [
+        {"intervalle": "0-5", "count": 10},
+        {"intervalle": "5-10", "count": 25},
+        {"intervalle": "10-15", "count": 40},
+        {"intervalle": "15-20", "count": 15},
+    ]
+    """
+
+    def get(self, request):
+        notes = get_notes_grouped()
+        
+        # Initialisation des intervalles
+        intervalles = [
+            {"min": 0, "max": 5, "label": "0-5", "count": 0},
+            {"min": 5, "max": 10, "label": "5-10", "count": 0},
+            {"min": 10, "max": 15, "label": "10-15", "count": 0},
+            {"min": 15, "max": 20, "label": "15-20", "count": 0},
+        ]
+
+        for note in notes:
+            valeur = note["note_finale"]
+            for intervalle in intervalles:
+                # On inclut la borne supérieure uniquement pour le dernier intervalle
+                if intervalle["min"] <= valeur < intervalle["max"] or (intervalle["max"] == 20 and valeur == 20):
+                    intervalle["count"] += 1
+                    break
+
+        # On prépare la sortie JSON
+        resultats = [{"intervalle": i["label"], "count": i["count"]} for i in intervalles]
+
+        return Response(resultats)
+
+
+
+@csrf_exempt
+def login_user(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+
+    data = json.loads(request.body.decode("utf-8"))
+    username = data.get("username")
+    password = data.get("password")
+
+    # ----- Authentification manuelle -----
+    if username == "admin" and password == "admin":
+        role = "admin"
+
+    elif username == "professeur" and password == "professeur":
+        role = "prof"
+
+    else:
+        return JsonResponse({"error": "Identifiants invalides"}, status=401)
+
+    # Si on arrive ici, auth réussie
+    return JsonResponse({
+        "message": "Connexion réussie",
+        "role": role,
+        "username": username,
+    })
