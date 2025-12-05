@@ -154,6 +154,42 @@ class MoyenneFinaleParFiliere(APIView):
         return Response(resultats)
     
 
+class MoyenneFinaleParClasse(APIView):
+    def get(self, request):
+        notes = get_notes_grouped()  # chaque note a -> id_classe_fk + note_finale
+
+        notes_par_classe = {}
+        for item in notes:
+            classe_id = item["id_classe_fk"]
+            notes_par_classe.setdefault(classe_id, []).append(item["note_finale"])
+
+        resultats = []
+        from .models import DimClasse
+        for classe_id, notes_list in notes_par_classe.items():
+            classe = DimClasse.objects.get(pk=classe_id)
+            moyenne = sum(notes_list) / len(notes_list)
+            resultats.append({
+                "Classe": classe.classe,
+                "Moyenne finale": round(moyenne, 2)
+            })
+        resultats = sorted(resultats, key=lambda x: x["Moyenne finale"], reverse=True)
+        return Response(resultats)
+
+
+class ListeCours(APIView):
+    def get(self, request):
+        from .models import DimCours
+        cours_list = DimCours.objects.all().order_by("cours")
+        resultats = [
+            {
+                "id": cours.id_cours_pk,
+                "cours": cours.cours
+            }
+            for cours in cours_list
+        ]
+        return Response(resultats)
+
+
 class HistogrammeNotes(APIView):
     """
     Retourne les intervalles de notes avec le nombre d'étudiants dans chaque intervalle.
@@ -190,6 +226,37 @@ class HistogrammeNotes(APIView):
 
         return Response(resultats)
 
+
+class MoyenneParSessionParCours(APIView):
+    def get(self, request):
+        from .models import DimSession, DimCours
+        cours_param = request.GET.get("cours")
+        if not cours_param:
+            return Response({"error": "Paramètre 'cours' requis."}, status=400)
+        try:
+            # Accepter l'ID ou le nom du cours comme paramètre
+            try:
+                cours_obj = DimCours.objects.get(pk=int(cours_param))
+            except ValueError:
+                cours_obj = DimCours.objects.get(cours=cours_param)
+        except DimCours.DoesNotExist:
+            return Response({"error": "Cours introuvable."}, status=404)
+        notes = get_notes_grouped()
+        notes_par_session = {}
+        for item in notes:
+            if item["id_cours_fk"] == cours_obj.pk:
+                session_id = item["id_session_fk"]
+                notes_par_session.setdefault(session_id, []).append(item["note_finale"])
+        resultats = []
+        for session_id, notes_list in notes_par_session.items():
+            session = DimSession.objects.get(pk=session_id)
+            moyenne = sum(notes_list) / len(notes_list)
+            resultats.append({
+                "Session": session.session_label if hasattr(session, 'session_label') else str(session_id),
+                "Moyenne finale": round(moyenne, 2)
+            })
+        resultats = sorted(resultats, key=lambda x: x["Session"])
+        return Response(resultats)
 
 
 @csrf_exempt
