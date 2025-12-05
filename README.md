@@ -1,10 +1,17 @@
 # Student-Performance-Data-Warehouse-and-Visualization
 
 ## Table of Content
+- [Demo](#demo)
 - [Summary](#summary)
 - [Dataset](#dataset)
 - [Data Warehouse](#data-warehouse)
 - [Jobs](#jobs)
+
+## Demo
+
+<video src="https://github.com/user-attachments/assets/948771e7-2b0a-4c88-adf5-d706eb0f953c" controls width="600">
+  Your browser does not support the video tag.
+</video>
 
 ## Summary 
 This is an end-to-end data engineering and analytics project focused on transforming raw academic evaluation data into reliable insights. The project integrates ETL pipelines built with **Talend** to extract, clean, and load **csv data** into a **PostgreSQL data warehouse** structured in **Star Model**. On top of this warehouse, a full web analytics platform is developed using **Django (backend API)** and **React.js (frontend)** to deliver dynamic dashboards and personalized views for administrators, professors, and students. The system provides indicators on student performance, course efficiency, evaluation criteria, and activity weighting, enabling data-driven academic decisions.
