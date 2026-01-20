@@ -6,34 +6,63 @@ import { Spinner } from "@/components/ui/spinner"
 import { SidebarNav } from "@/components/sidebar-nav"
 import { TopNavBar } from "@/components/top-nav-bar"
 
-// Import des nouveaux composants pour les sélecteurs
 import ClasseSelectionDialog from "@/components/student/ClasseSelectionDialog"
 import EtudiantSelectionDialog from "@/components/student/EtudiantSelectionDialog"
 
-// Composant pour le contenu du dashboard étudiant
-function StudentDashboardContent({ etudiantId }: { etudiantId: string }) {
+import { KPICardMoyenneFinale } from "@/components/student/kpi/KPICardMoyenneFinale"
+import { KPICardClassement } from "@/components/student/kpi/KPICardClassement"
+
+import { StudentProgressionChart } from "@/components/student/charts/StudentProgressionChart"
+
+
+/* ================================
+   DASHBOARD CONTENU ÉTUDIANT
+================================ */
+function StudentDashboardContent({
+  etudiantId,
+  classeId,
+}: {
+  etudiantId: string
+  classeId: string
+}) {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Dashboard Étudiant</h1>
-      <p>Affichage des informations pour l'étudiant ID: {etudiantId}</p>
-      {/* Ici tu pourras ajouter tes graphiques, KPIs, tableaux, etc */}
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold">Dashboard Étudiant</h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <KPICardMoyenneFinale etudiantId={etudiantId} />
+        <KPICardClassement
+          etudiantId={etudiantId}
+          classeId={classeId}
+        />
+        <StudentProgressionChart etudiantId={etudiantId} />
+      </div>
     </div>
   )
 }
 
+/* ================================
+   PAGE PRINCIPALE
+================================ */
 export default function DashboardStudentPage() {
   const router = useRouter()
+
   const [isLoading, setIsLoading] = useState(true)
   const [userRole, setUserRole] = useState("")
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Nouveaux états pour les sélecteurs
   const [selectedClasse, setSelectedClasse] = useState("")
   const [selectedEtudiant, setSelectedEtudiant] = useState("")
+
+  const resetDashboard = () => {
+    setSelectedClasse("")
+    setSelectedEtudiant("")
+  }
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token")
     const role = localStorage.getItem("user_role") || ""
+
     setUserRole(role)
 
     if (!token) {
@@ -45,7 +74,7 @@ export default function DashboardStudentPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen">
         <Spinner className="h-8 w-8" />
       </div>
     )
@@ -53,52 +82,79 @@ export default function DashboardStudentPage() {
 
   if (userRole !== "admin") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background text-red-500 text-xl font-bold">
+      <div className="flex items-center justify-center min-h-screen text-red-500 text-xl font-bold">
         Accès non autorisé
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen overflow-hidden">
+
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transform transition-transform duration-200 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r
+        transform transition-transform duration-200
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <SidebarNav />
       </aside>
 
-      {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 sm:hidden"
+          className="fixed inset-0 bg-black/50 sm:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Main content */}
+      {/* Main */}
       <div
-        className={`flex-1 flex flex-col overflow-hidden transition-all duration-200 ease-in-out ${
-          sidebarOpen ? "sm:ml-64" : "sm:ml-0"
-        }`}
+        className={`flex-1 flex flex-col transition-all
+        ${sidebarOpen ? "sm:ml-64" : ""}`}
       >
         <TopNavBar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-auto p-6">
-          {/* Sélecteur de classe */}
-          <ClasseSelectionDialog onSelectClass={setSelectedClasse} />
 
-          {/* Sélecteur d'étudiant, affiché seulement si une classe est sélectionnée */}
-          {selectedClasse && (
+        <main className="flex-1 overflow-auto p-6 space-y-6">
+
+          {/* ======================
+              ÉTAT 1 : choix classe
+          ====================== */}
+          {!selectedClasse && !selectedEtudiant && (
+            <ClasseSelectionDialog
+              onSelectClass={setSelectedClasse}
+            />
+          )}
+
+          {/* ======================
+              ÉTAT 2 : choix étudiant
+          ====================== */}
+          {selectedClasse && !selectedEtudiant && (
             <EtudiantSelectionDialog
               classeId={selectedClasse}
               onSelectEtudiant={setSelectedEtudiant}
             />
           )}
 
-          {/* Dashboard étudiant, affiché seulement si un étudiant est sélectionné */}
-          {selectedEtudiant && <StudentDashboardContent etudiantId={selectedEtudiant} />}
+          {/* ======================
+              ÉTAT 3 : dashboard
+          ====================== */}
+          {selectedClasse && selectedEtudiant && (
+            <div className="space-y-6">
+
+              <button
+                onClick={resetDashboard}
+                className="px-4 py-2 border rounded-md hover:bg-muted transition"
+              >
+                Changer d’étudiant
+              </button>
+
+              <StudentDashboardContent
+                etudiantId={selectedEtudiant}
+                classeId={selectedClasse}
+              />
+            </div>
+          )}
+
         </main>
       </div>
     </div>

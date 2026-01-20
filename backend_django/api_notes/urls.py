@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import login_user, ListeEtudiantsParClasse, HistogrammeNotes, MoyenneParCours, TauxReussite, PoidsMoyenParActivite, NoteFinaleParEtudiant, MoyenneFinaleParFiliere, MoyenneFinaleParClasse, MoyenneParSessionParCours, ListeCours, ListeClasses
+from .views import evolution_notes_etudiant, moyenne_etudiant, classement_etudiant, login_user, ListeEtudiantsParClasse, HistogrammeNotes, MoyenneParCours, TauxReussite, PoidsMoyenParActivite, NoteFinaleParEtudiant, MoyenneFinaleParFiliere, MoyenneFinaleParClasse, MoyenneParSessionParCours, ListeCours, ListeClasses
 
 urlpatterns = [
     path("stats/moyenne-par-cours/", MoyenneParCours.as_view(), name="moyenne-par-cours"),
@@ -13,5 +13,20 @@ urlpatterns = [
     path('cours/', ListeCours.as_view()),
     path('login/', login_user),    
     path("classes/", ListeClasses.as_view()),
-    path("etudiants/", ListeEtudiantsParClasse.as_view())
+    path("etudiants/", ListeEtudiantsParClasse.as_view()),
+    path(
+        "moyenne-etudiant/",
+        moyenne_etudiant,
+        name="moyenne-etudiant"
+    ),
+    path(
+        "classement-etudiant/",
+        classement_etudiant,
+        name="classement-etudiant"
+    ),
+    path(
+        "progression-sessions/",
+        evolution_notes_etudiant,
+        name="evolution_notes_etudiant"
+    )
 ]

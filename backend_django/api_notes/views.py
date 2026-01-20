@@ -1,15 +1,16 @@
 from django.shortcuts import render
 
 # Create your views here.
-
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Avg, Sum
-from .models import FaitNotes, DimEtudiant, DimCours, DimFiliere, DimClasse
+from .models import FaitNotes, DimEtudiant, DimCours, DimFiliere, DimClasse, DimSession
 from .utils import get_notes_grouped
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from collections import defaultdict
 
 
 class MoyenneParCours(APIView):
@@ -345,3 +346,175 @@ class ListeEtudiantsParClasse(APIView):
         ]
 
         return Response(resultats)
+
+
+
+@api_view(["GET"])
+def moyenne_etudiant(request):
+    """
+    GET /api/stats/etudiant/moyenne/?etudiant=E1
+    """
+    etudiant_id = request.GET.get("etudiant")
+
+    if not etudiant_id:
+        return Response(
+            {"error": "Paramètre etudiant manquant"},
+            status=400
+        )
+
+    notes = get_notes_grouped()
+
+    # récupérer les notes de l'étudiant
+    notes_etudiant = [
+        n["note_finale"]
+        for n in notes
+        if str(n["id_etudiant_fk"]) == str(etudiant_id)
+    ]
+
+    if not notes_etudiant:
+        return Response(
+            {"etudiant": etudiant_id, "moyenne_finale": None}
+        )
+
+    moyenne = round(sum(notes_etudiant) / len(notes_etudiant), 2)
+
+    return Response({
+        "etudiant": etudiant_id,
+        "moyenne_finale": moyenne,
+        "nombre_cours": len(notes_etudiant)
+    })
+
+
+@api_view(["GET"])
+def classement_etudiant(request):
+    """
+    GET /api/stats/etudiant/classement/?etudiant=E1&classe=1
+    """
+
+    etudiant_id = request.GET.get("etudiant")
+    classe_id = request.GET.get("classe")
+
+    if not etudiant_id or not classe_id:
+        return Response(
+            {"error": "Paramètres etudiant et classe requis"},
+            status=400
+        )
+
+    notes = get_notes_grouped()
+
+    # filtrer par classe
+    notes_classe = [
+        n for n in notes
+        if str(n["id_classe_fk"]) == str(classe_id)
+    ]
+
+    # total par étudiant
+    totals = {}
+
+    for n in notes_classe:
+        etu = str(n["id_etudiant_fk"])
+        totals.setdefault(etu, 0)
+        totals[etu] += float(n["note_finale"])
+
+    # classement décroissant
+    classement = sorted(
+        totals.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    # attribution des rangs
+    rangs = {}
+    rang = 1
+    for etu, score in classement:
+        rangs[etu] = rang
+        rang += 1
+
+    return Response({
+        "etudiant": etudiant_id,
+        "classe": classe_id,
+        "rang": rangs.get(str(etudiant_id)),
+        "effectif_classe": len(classement)
+    })
+
+
+
+@api_view(["GET"])
+def evolution_notes_etudiant(request):
+    """
+    Évolution des notes d'un étudiant par session
+    (tous cours confondus)
+
+    Paramètre :
+        ?etudiant=<id_etudiant>
+
+    Retour :
+    [
+        {
+            "Session": "Session 1",
+            "Moyenne étudiant": 12.45
+        },
+        {
+            "Session": "Session 2",
+            "Moyenne étudiant": 13.80
+        }
+    ]
+    """
+
+    etudiant_id = request.GET.get("etudiant")
+
+    if not etudiant_id:
+        return JsonResponse(
+            {"error": "Paramètre etudiant manquant"},
+            status=400
+        )
+
+    # 🔹 Données DW déjà agrégées
+    notes = get_notes_grouped()
+
+    # 🔹 Filtrer uniquement l'étudiant
+    notes_etudiant = [
+        n for n in notes
+        if str(n["id_etudiant_fk"]) == str(etudiant_id)
+    ]
+
+    if not notes_etudiant:
+        return JsonResponse([], safe=False)
+
+    # ===============================
+    # Regroupement par session
+    # ===============================
+    sessions = defaultdict(list)
+
+    for note in notes_etudiant:
+        session_id = note["id_session_fk"]
+        sessions[session_id].append(note["note_finale"])
+
+    # ===============================
+    # Récupération noms sessions
+    # ===============================
+    session_map = {
+        s.id_session_pk: s.session_label
+        for s in DimSession.objects.all()
+    }
+
+    # ===============================
+    # Construction réponse finale
+    # ===============================
+    resultat = []
+
+    for session_id, notes_session in sessions.items():
+        moyenne = round(
+            sum(notes_session) / len(notes_session),
+            2
+        )
+
+        resultat.append({
+            "Session": session_map.get(session_id, f"Session {session_id}"),
+            "Moyenne étudiant": moyenne
+        })
+
+    # 🔹 ordre chronologique
+    resultat.sort(key=lambda x: x["Session"])
+
+    return JsonResponse(resultat, safe=False)
