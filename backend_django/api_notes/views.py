@@ -5,11 +5,12 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Avg, Sum
-from .models import FaitNotes, DimEtudiant, DimCours, DimFiliere
+from .models import FaitNotes, DimEtudiant, DimCours, DimFiliere, DimClasse
 from .utils import get_notes_grouped
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+
 
 class MoyenneParCours(APIView):
     def get(self, request):
@@ -284,3 +285,63 @@ def login_user(request):
         "role": role,
         "username": username,
     })
+
+
+
+class ListeClasses(APIView):
+    def get(self, request):
+        classes = DimClasse.objects.all().order_by("classe")
+
+        resultats = [
+            {
+                "id": classe.id_classe_pk,
+                "classe": classe.classe
+            }
+            for classe in classes
+        ]
+
+        return Response(resultats)
+    
+
+
+class ListeEtudiantsParClasse(APIView):
+    def get(self, request):
+
+        classe_id = request.GET.get("classe")
+
+        if not classe_id:
+            return Response(
+                {"error": "Paramètre 'classe' requis"},
+                status=400
+            )
+
+        # Vérifier que la classe existe
+        try:
+            classe = DimClasse.objects.get(pk=classe_id)
+        except DimClasse.DoesNotExist:
+            return Response(
+                {"error": "Classe introuvable"},
+                status=404
+            )
+
+        # 🔹 Récupération des étudiants DISTINCTS de cette classe
+        etudiants_ids = (
+            FaitNotes.objects
+            .filter(id_classe_fk=classe)
+            .values_list("id_etudiant_fk", flat=True)
+            .distinct()
+        )
+
+        etudiants = DimEtudiant.objects.filter(
+            id_etudiant_pk__in=etudiants_ids
+        ).order_by("nom_etudiant")
+
+        resultats = [
+            {
+                "id": etu.id_etudiant_pk,
+                "nom": etu.nom_etudiant
+            }
+            for etu in etudiants
+        ]
+
+        return Response(resultats)
